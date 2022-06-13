@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class SpawnFakeSymbols : StateMachineBehaviour
 {
+    private SymbolSpawner symbolSpawner;
+    private void Awake()
+    {
+        symbolSpawner = GameObject.FindGameObjectWithTag("Symbol Spawner").GetComponent<SymbolSpawner>();
+    }
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        symbolSpawner.SpawnFakeSymbols();
+    }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

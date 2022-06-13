@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class BetAwaiter : MonoBehaviour
 {
+    private GameState gameState;
+    private void Awake()
+    {
+        gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
+    }
+
     public bool GetSpinInput()
     {
         bool input = Input.GetKeyUp(KeyCode.Return);
