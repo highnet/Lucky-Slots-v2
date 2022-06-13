@@ -9,7 +9,9 @@ public class SymbolSpawner : MonoBehaviour
     private SlotsAnchors slotsAnchors;
     private GameState gameState;
     private SpinGenerator spinGenerator;
+    private ActiveSymbols activeSymbols;
     private bool spawningFakeSymbols;
+    [SerializeField]
 
     private void Awake()
     {
@@ -17,12 +19,17 @@ public class SymbolSpawner : MonoBehaviour
         slotsAnchors = GameObject.FindGameObjectWithTag("Slots Anchors").GetComponent<SlotsAnchors>();
         gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
         spinGenerator = GameObject.FindGameObjectWithTag("Spin Generator").GetComponent<SpinGenerator>();
+        activeSymbols = GameObject.FindGameObjectWithTag("Active Symbols").GetComponent<ActiveSymbols>();
     }
 
     public void SpawnRealSymbols()
     {
         StartCoroutine(SpawnRealSymbolsCoroutine());
-        StartCoroutine(ProceedToNextStateAfterSeconds(2.0f));
+    }
+
+    private void Update()
+    {
+        gameState.SetBool("Active Symbols Has Active Tweens", activeSymbols.HasActiveTween());
     }
 
     private IEnumerator SpawnRealSymbolsCoroutine()
@@ -37,6 +44,7 @@ public class SymbolSpawner : MonoBehaviour
                 yield return new WaitForSeconds(.04f);
 
                 GameObject gameSymbolGO = gameSymbolPool.FetchFromPool(spinnedSymbols[i, j]);
+                activeSymbols.AddToActiveSymbols(gameSymbolGO);
                 GameSymbol gameSymbol = gameSymbolGO.GetComponent<GameSymbol>();
                 gameSymbol.MoveToPosition(slotsAnchors.GetStartAnchors()[j].transform.position);
                 gameSymbol.SetTweenParameters(slotsAnchors.GetSymbolAnchors()[i, j].transform.position, .8f);
@@ -47,11 +55,10 @@ public class SymbolSpawner : MonoBehaviour
         
     }
 
-    private IEnumerator ProceedToNextStateAfterSeconds(float seconds)
+    private IEnumerator TryProceedToNextStateEverySeconds(float seconds)
     {
         yield return new WaitForSeconds(seconds);
         gameState.SetTrigger("Spawned Real Symbols");
-
     }
 
     private IEnumerator SpawnFakeSymbolsCoroutine()
@@ -63,6 +70,7 @@ public class SymbolSpawner : MonoBehaviour
                 yield return new WaitForSeconds(.04f);
 
                 GameObject gameSymbolGO = gameSymbolPool.FetchFromPool((Symbol)UnityEngine.Random.Range(0, SlotsAttributes.GetNumberOfSymbols()));
+                activeSymbols.AddToActiveSymbols(gameSymbolGO);
                 GameSymbol gameSymbol = gameSymbolGO.GetComponent<GameSymbol>();
                 gameSymbol.MoveToPosition(slotsAnchors.GetStartAnchors()[i].transform.position);
                 gameSymbol.SetTweenParameters(slotsAnchors.GetEndAnchors()[i].transform.position, .8f);
@@ -77,7 +85,7 @@ public class SymbolSpawner : MonoBehaviour
     {
         spawningFakeSymbols = true;
         StartCoroutine(SpawnFakeSymbolsCoroutine());
-        StartCoroutine(StopSpawningFakeSymbolsAfterSeconds(1.5f));
+        StartCoroutine(StopSpawningFakeSymbolsAfterSeconds(3.0f));
     }
 
     private IEnumerator StopSpawningFakeSymbolsAfterSeconds(float seconds)

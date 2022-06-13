@@ -13,15 +13,22 @@ public class GameSymbol : MonoBehaviour
     [SerializeField]
     private float tweenDuration;
     private bool isFakeSymbol;
-
     private Tween tween;
 
     private GameSymbolPool gameSymbolPool;
+    private ActiveSymbols activeSymbols;
 
     private void Awake()
     {
         endPosition = new Vector3(-1f, -1f, -1f);
         gameSymbolPool = GameObject.FindGameObjectWithTag("Game Symbol Pool").GetComponent<GameSymbolPool>();
+        activeSymbols = GameObject.FindGameObjectWithTag("Active Symbols").GetComponent<ActiveSymbols>();
+
+    }
+
+    public Tween GetTween()
+    {
+        return tween;
     }
 
     private void Update()
@@ -46,11 +53,12 @@ public class GameSymbol : MonoBehaviour
     {
         if (isFakeSymbol)
         {
-            tween = null;
-            endPosition = new Vector3(-1f, -1f, -1f);
             MoveToPosition(new Vector3(50f, 50f, 0f));
             gameSymbolPool.AddToPool(this.symbol, this.gameObject);
+            activeSymbols.RemoveFromActiveSymbols(this.gameObject);
         }
+        tween = null;
+        endPosition = new Vector3(-1f, -1f, -1f);
     }
 
     internal void MoveToPosition(Vector3 newPosition)
