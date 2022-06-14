@@ -27,11 +27,6 @@ public class SymbolSpawner : MonoBehaviour
         StartCoroutine(SpawnRealSymbolsCoroutine());
     }
 
-    private void Update()
-    {
-        gameState.SetBool("Active Symbols Has Active Tweens", activeSymbols.HasActiveTween());
-    }
-
     private IEnumerator SpawnRealSymbolsCoroutine()
     {
         SpinDatum spinDatum = spinGenerator.GetSpinDatum();
@@ -41,13 +36,15 @@ public class SymbolSpawner : MonoBehaviour
         {
             for (int j = 0; j < SlotsAttributes.GetNumberOfReels(); j++)
             {
-                yield return new WaitForSeconds(.04f);
 
                 GameObject gameSymbolGO = gameSymbolPool.FetchFromPool(spinnedSymbols[i, j]);
                 activeSymbols.AddToActiveSymbols(gameSymbolGO);
                 GameSymbol gameSymbol = gameSymbolGO.GetComponent<GameSymbol>();
                 gameSymbol.MoveToPosition(slotsAnchors.GetStartAnchors()[j].transform.position);
                 gameSymbol.SetTweenParameters(slotsAnchors.GetSymbolAnchors()[i, j].transform.position, .8f);
+                gameSymbol.SetResetPosition(slotsAnchors.GetEndAnchors()[j].transform.position);
+                gameSymbol.SetForceTween(true);
+                yield return new WaitForSeconds(.04f);
 
             }
 
@@ -67,7 +64,6 @@ public class SymbolSpawner : MonoBehaviour
         {
             for (int i = 0; i < SlotsAttributes.GetNumberOfReels(); i++)
             {
-                yield return new WaitForSeconds(.04f);
 
                 GameObject gameSymbolGO = gameSymbolPool.FetchFromPool((Symbol)UnityEngine.Random.Range(0, SlotsAttributes.GetNumberOfSymbols()));
                 activeSymbols.AddToActiveSymbols(gameSymbolGO);
@@ -75,6 +71,8 @@ public class SymbolSpawner : MonoBehaviour
                 gameSymbol.MoveToPosition(slotsAnchors.GetStartAnchors()[i].transform.position);
                 gameSymbol.SetTweenParameters(slotsAnchors.GetEndAnchors()[i].transform.position, .8f);
                 gameSymbol.SetIsFakeSymbol(true);
+                gameSymbol.SetForceTween(true);
+                yield return new WaitForSeconds(.04f);
 
 
             }

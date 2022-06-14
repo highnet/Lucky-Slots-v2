@@ -6,12 +6,14 @@ public class ActiveSymbols : MonoBehaviour
 {
     [SerializeField]
     private List<GameObject> activeSymbols;
+    private GameState gameState;
     private void Awake()
     {
         activeSymbols = new List<GameObject>();
+        gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
     }
 
-    public List<GameObject> GetActiveSymbols()
+    public List<GameObject> GetActiveGameSymbols()
     {
         return activeSymbols;
     }
@@ -24,11 +26,10 @@ public class ActiveSymbols : MonoBehaviour
     {
         activeSymbols.Remove(objectToRemove);
     }
-
     public bool HasActiveTween()
     {
 
-        for(int i = 0; i < activeSymbols.Count; i++)
+        for (int i = 0; i < activeSymbols.Count; i++)
         {
             GameSymbol gameSymbol = activeSymbols[i].GetComponent<GameSymbol>();
             if (gameSymbol.GetTween() != null)
@@ -39,4 +40,8 @@ public class ActiveSymbols : MonoBehaviour
         return false;
     }
 
+    private void Update()
+    {
+        gameState.SetBool("Active Symbols Has Active Tweens", HasActiveTween());
+    }
 }

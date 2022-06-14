@@ -11,9 +11,15 @@ public class GameSymbol : MonoBehaviour
     [SerializeField]
     private Vector3 endPosition;
     [SerializeField]
+    private Vector3 resetPosition;
+    [SerializeField]
     private float tweenDuration;
+    [SerializeField]
     private bool isFakeSymbol;
+    [SerializeField]
     private Tween tween;
+    [SerializeField]
+    private bool forceTween;
 
     private GameSymbolPool gameSymbolPool;
     private ActiveSymbols activeSymbols;
@@ -21,9 +27,16 @@ public class GameSymbol : MonoBehaviour
     private void Awake()
     {
         endPosition = new Vector3(-1f, -1f, -1f);
+        tweenDuration = 0f;
+        forceTween = false;
         gameSymbolPool = GameObject.FindGameObjectWithTag("Game Symbol Pool").GetComponent<GameSymbolPool>();
         activeSymbols = GameObject.FindGameObjectWithTag("Active Symbols").GetComponent<ActiveSymbols>();
 
+    }
+
+    internal Vector3 GetResetPosition()
+    {
+        return resetPosition;
     }
 
     public Tween GetTween()
@@ -31,12 +44,27 @@ public class GameSymbol : MonoBehaviour
         return tween;
     }
 
+    public void SetForceTween(bool predicate)
+    {
+        forceTween = predicate;
+    }
+
+    public void SetTweenDuration(float newTweenDuration)
+    {
+        tweenDuration = newTweenDuration;
+    }
+
     private void Update()
     {
-        if (tween == null && endPosition != new Vector3(-1f, -1f, -1f) && tweenDuration != 0)
+        if (tween == null && forceTween)
         {
             tween = this.transform.DOMove(endPosition, tweenDuration).OnComplete(TryResetSymbol);
         }
+    }
+
+    public Vector3 GetEndPosition()
+    {
+        return endPosition;
     }
 
     public bool IsFakeSymbol()
@@ -49,16 +77,25 @@ public class GameSymbol : MonoBehaviour
         isFakeSymbol = predicate;
     }
 
-    private void TryResetSymbol()
+    public void TryResetSymbol()
     {
         if (isFakeSymbol)
         {
             MoveToPosition(new Vector3(50f, 50f, 0f));
             gameSymbolPool.AddToPool(this.symbol, this.gameObject);
             activeSymbols.RemoveFromActiveSymbols(this.gameObject);
+            endPosition = new Vector3(-1f, -1f, -1f);
+            tweenDuration = 0f;
+            isFakeSymbol = false;
+
         }
+        forceTween = false;
         tween = null;
-        endPosition = new Vector3(-1f, -1f, -1f);
+    }
+
+    public void SetResetPosition(Vector3 newResetPosition)
+    {
+        resetPosition = newResetPosition;
     }
 
     internal void MoveToPosition(Vector3 newPosition)

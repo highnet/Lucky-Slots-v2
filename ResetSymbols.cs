@@ -2,20 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CalculatePayout : StateMachineBehaviour
+public class ResetSymbols : StateMachineBehaviour
 {
-    private GameState gameState;
+    private SymbolResetter symbolResetter;
 
     private void Awake()
     {
-        gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
-
+        symbolResetter = GameObject.FindGameObjectWithTag("Symbol Resetter").GetComponent<SymbolResetter>();
     }
-
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        gameState.SetTrigger("Calculated Payout");
+        symbolResetter.ResetActiveSymbols();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
