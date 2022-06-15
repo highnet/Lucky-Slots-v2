@@ -6,10 +6,21 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField]
-    private float bet;
+    private float bet = 0.1f;
     [SerializeField]
-    private float balance;
+    private float balance = 100f;
+    private UI ui;
 
+    private void Awake()
+    {
+        ui = GameObject.FindGameObjectWithTag("UI").GetComponent<UI>();
+    }
+
+    public void AwardBalance(float winnings)
+    {
+        balance += winnings;
+        ui.UpdateBalanceText();
+    }
 
     public float GetBet()
     {
@@ -24,6 +35,7 @@ public class Player : MonoBehaviour
     public void PlaceBet()
     {
         balance -= bet;
+        ui.UpdateBalanceText();
     }
 
     public bool CanSetBet()

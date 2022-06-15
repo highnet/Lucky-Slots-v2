@@ -30,7 +30,7 @@ public class SymbolSpawner : MonoBehaviour
     private IEnumerator SpawnRealSymbolsCoroutine()
     {
         SpinDatum spinDatum = spinGenerator.GetSpinDatum();
-        Symbol[,] spinnedSymbols = spinDatum.GetSpinnedSymbols();
+        Symbol[,] spinnedSymbols = spinDatum.GetSpinnedSymbolsWithWilds();
         
         for (int i = SlotsAttributes.GetNumberOfRows()-1; i >= 0 ; i--)
         {

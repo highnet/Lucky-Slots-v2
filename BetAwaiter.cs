@@ -10,6 +10,11 @@ public class BetAwaiter : MonoBehaviour
         gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
     }
 
+    public void SpinInput()
+    {
+        gameState.SetTrigger("Awaited Bet");
+    }
+
     public bool GetSpinInput()
     {
         bool input = Input.GetKeyUp(KeyCode.Return);

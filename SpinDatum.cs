@@ -6,42 +6,91 @@ using UnityEngine;
 public enum Symbol { Ten, Jack, Queen, King, Ace, Wild, Bonus};
 public class SpinDatum
 {
-    private Symbol[,] spinnedSymbols;
+    private Symbol[,] spinnedSymbolsWithWilds;
+    private List<Symbol[,]> spinnedSymbolsReplacedWilds;
 
     public SpinDatum()
     {
-        spinnedSymbols = GenerateRoll();
-        PrintSpinnedSymbols();
+        spinnedSymbolsWithWilds = GenerateRoll();
+        PrintSpinnedSymbolsWithWilds();
+        spinnedSymbolsReplacedWilds = ReplaceWilds();
+        PrintSpinnedSymbolsWithWildsReplaced();
     }
 
-    public Symbol[,] GetSpinnedSymbols()
+    private void PrintSpinnedSymbolsWithWildsReplaced()
     {
-        return spinnedSymbols;
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < SlotsAttributes.GetNumberOfRows(); j++)
+            {
+                for (int k = 0; k < SlotsAttributes.GetNumberOfReels(); k++)
+                {
+                    Debug.Log(i + "-> (" + j + "," + k + "): " + spinnedSymbolsReplacedWilds[i][j,k]);
+
+                }
+            }
+        }
     }
 
-    private void PrintSpinnedSymbols()
+    public List<Symbol[,]> GetSpinnedSymbolsWithWildsReplaced()
+    {
+        return spinnedSymbolsReplacedWilds;
+    }
+
+    public List<Symbol[,]> ReplaceWilds()
+    {
+        List<Symbol[,]> listOfSymbolsArrays = new List<Symbol[,]>();
+
+        for (int i = 0; i < 5; i++)
+        {
+            listOfSymbolsArrays.Add(new Symbol[SlotsAttributes.GetNumberOfRows(), SlotsAttributes.GetNumberOfReels()]);
+            for (int j = 0; j < SlotsAttributes.GetNumberOfRows(); j++)
+            {
+                for (int k = 0; k < SlotsAttributes.GetNumberOfReels(); k++)
+                {
+                    if (spinnedSymbolsWithWilds[j, k] == Symbol.Wild)
+                    {
+                        listOfSymbolsArrays[i][j, k] = (Symbol)i;
+                    } else
+                    {
+                        listOfSymbolsArrays[i][j, k] = spinnedSymbolsWithWilds[j, k];
+
+                    }
+                }
+            }
+        }
+
+        return listOfSymbolsArrays;
+    }
+
+    public Symbol[,] GetSpinnedSymbolsWithWilds()
+    {
+        return spinnedSymbolsWithWilds;
+    }
+
+    private void PrintSpinnedSymbolsWithWilds()
     {
         for (int i = 0; i < SlotsAttributes.GetNumberOfRows(); i++)
         {
             for (int j = 0; j < SlotsAttributes.GetNumberOfReels(); j++)
             {
-                Debug.Log("(" + i + "," + j + "): " + spinnedSymbols[i, j]);
+                Debug.Log("(" + i + "," + j + "): " + spinnedSymbolsWithWilds[i, j]);
             }
         }
     }
 
     private Symbol[,] GenerateRoll()
     {
-        Symbol[,] symbols = new Symbol[SlotsAttributes.GetNumberOfRows(), SlotsAttributes.GetNumberOfReels()];
+        Symbol[,] symbolsArray = new Symbol[SlotsAttributes.GetNumberOfRows(), SlotsAttributes.GetNumberOfReels()];
 
 
         for(int i = 0; i < SlotsAttributes.GetNumberOfRows(); i++)
         {
             for (int j = 0; j < SlotsAttributes.GetNumberOfReels(); j++)
             {
-                symbols[i, j] = (Symbol)UnityEngine.Random.Range(0, SlotsAttributes.GetNumberOfSymbols());
+                symbolsArray[i, j] = (Symbol)UnityEngine.Random.Range(0, SlotsAttributes.GetNumberOfSymbols());
             }
         }
-        return symbols;
+        return symbolsArray;
     }
 }

@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class CalculatePayout : StateMachineBehaviour
 {
-    private GameState gameState;
+    private PayoutCalculator payoutCalculator;
 
     private void Awake()
     {
-        gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
+        payoutCalculator = GameObject.FindGameObjectWithTag("Payout Calculator").GetComponent<PayoutCalculator>();
 
     }
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        gameState.SetTrigger("Calculated Payout");
+        payoutCalculator.CalculatePayout();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
