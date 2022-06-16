@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class AnimateWinnings : StateMachineBehaviour
 {
+    private GameState gameState;
+    private void Awake()
+    {
+        gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
+
+    }
     // OnStateEnter is called before OnStateEnter is called on any state inside this state machine
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        gameState.SetTrigger("Animated Winnings");
+
+    }
 
     // OnStateUpdate is called before OnStateUpdate is called on any state inside this state machine
     //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
