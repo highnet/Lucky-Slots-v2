@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnFakeSymbols : StateMachineBehaviour
+public class SpawnRealSymbols : StateMachineBehaviour
 {
+
     private SymbolSpawner symbolSpawner;
+
     private void Awake()
     {
         symbolSpawner = GameObject.FindGameObjectWithTag("Symbol Spawner").GetComponent<SymbolSpawner>();
@@ -12,7 +14,7 @@ public class SpawnFakeSymbols : StateMachineBehaviour
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        symbolSpawner.SpawnFakeSymbols();
+        symbolSpawner.SpawnRealSymbols();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

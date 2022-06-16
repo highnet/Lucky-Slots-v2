@@ -2,17 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnFakeSymbols : StateMachineBehaviour
+public class AnimatePaylines : StateMachineBehaviour
 {
-    private SymbolSpawner symbolSpawner;
+
+    private PaylineAnimator paylineAnimator;
+    private GameState gameState;
+
     private void Awake()
     {
-        symbolSpawner = GameObject.FindGameObjectWithTag("Symbol Spawner").GetComponent<SymbolSpawner>();
+        paylineAnimator = GameObject.FindGameObjectWithTag("Payline Animator").GetComponent<PaylineAnimator>(); 
+        gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
+
     }
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        symbolSpawner.SpawnFakeSymbols();
+        paylineAnimator.AnimatePaylines();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

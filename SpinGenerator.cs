@@ -1,18 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class SpinGenerator : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private SpinDatum spinDatum;
+
+
+    public SpinDatum GetSpinDatum()
     {
-        
+        return spinDatum;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void GenerateSpin()
     {
-        
+        spinDatum = new SpinDatum();
     }
 }
