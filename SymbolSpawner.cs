@@ -25,6 +25,7 @@ public class SymbolSpawner : MonoBehaviour
     public void SpawnRealSymbols()
     {
         StartCoroutine(SpawnRealSymbolsCoroutine());
+        StartCoroutine(TransitionToNextStateEverySeconds(2.0f));
     }
 
     private IEnumerator SpawnRealSymbolsCoroutine()
@@ -52,7 +53,7 @@ public class SymbolSpawner : MonoBehaviour
         
     }
 
-    private IEnumerator TryProceedToNextStateEverySeconds(float seconds)
+    private IEnumerator TransitionToNextStateEverySeconds(float seconds)
     {
         yield return new WaitForSeconds(seconds);
         gameState.SetTrigger("Spawned Real Symbols");
@@ -66,7 +67,7 @@ public class SymbolSpawner : MonoBehaviour
             {
 
                 GameObject gameSymbolGO = gameSymbolPool.FetchFromPool((Symbol)UnityEngine.Random.Range(0, SlotsAttributes.GetNumberOfSymbols()));
-                activeSymbols.AddToActiveSymbols(gameSymbolGO);
+          //      activeSymbols.AddToActiveSymbols(gameSymbolGO);
                 GameSymbol gameSymbol = gameSymbolGO.GetComponent<GameSymbol>();
                 gameSymbol.MoveToPosition(slotsAnchors.GetStartAnchors()[i].transform.position);
                 gameSymbol.SetTweenParameters(slotsAnchors.GetEndAnchors()[i].transform.position, .8f);

@@ -19,7 +19,7 @@ public class SymbolResetter : MonoBehaviour
     public void ResetActiveSymbols()
     {
         StartCoroutine(ResetActiveSymbolsCoroutine());
-
+        StartCoroutine(TransitionToNextStateAfterSeconds(2.0f));
     }
 
     private IEnumerator TransitionToNextStateAfterSeconds(float seconds)
