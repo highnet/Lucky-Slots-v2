@@ -16,7 +16,7 @@ public class PaylineSpawner : MonoBehaviour
         activePaylines = new List<GameObject>();
         paylinesPool = new List<GameObject>();
 
-        for(int i = 0; i < 20; i++)
+        for(int i = 0; i < 50; i++)
         {
             GameObject paylineGO = GameObject.Instantiate(paylinePrefab,new Vector3(50f,50f,50f),Quaternion.identity);
             AddToPaylinesPool(paylineGO);

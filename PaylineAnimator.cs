@@ -17,19 +17,20 @@ public class PaylineAnimator : MonoBehaviour
     }
     public void AnimatePaylines()
     {
-        Dictionary<Symbol, List<Vector2>> payoutReconstructedPaths = payoutCalculator.GetPayoutReconstructedPaths();
+        Dictionary<Symbol, List<List<Vector2>>> winnerPayoutPaths = payoutCalculator.GetWinnerPayoutPaths();
 
         for(int i = 0; i < 5; i++)
         {
-            if (payoutReconstructedPaths[(Symbol) i].Count > 2)
+            foreach(List<Vector2> path in winnerPayoutPaths[(Symbol)i])
             {
-
                 GameObject paylineGO = paylineSpawner.FetchFromPaylinesPool();
                 paylineSpawner.AddToActivePaylines(paylineGO);
                 Payline payline = paylineGO.GetComponent<Payline>();
-                payline.SetPath(payoutReconstructedPaths[(Symbol)i]);
+                payline.SetPath(path);
                 payline.RenderPayline();
             }
+
+
         }
         gameState.SetTrigger("Animated Paylines");
 

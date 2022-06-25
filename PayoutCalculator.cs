@@ -7,225 +7,48 @@ public class PayoutCalculator : MonoBehaviour
 {
     private GameState gameState;
     private SpinGenerator spinGenerator;
-    private Symbol[,] spinnedSymbols;
-    private Symbol scanSymbol;
-
-    private Dictionary<Symbol, int> payoutTallies;
-    private Dictionary<Symbol, Vector2> payoutStartingVertex;
-    private Dictionary<Symbol, List<Vector2>> payoutReconstructedPaths;
+    private PaylinePathGenerator paylinePathGenerator;
+    private Dictionary<Symbol, List<string>> payoutTallies  ;
+    private Dictionary<Symbol, List<List<Vector2>>> matchedPaylinesAnySize;
+    private Dictionary<Symbol, List<List<Vector2>>> matchedPaylinesSize5;
+    private Dictionary<Symbol, List<List<Vector2>>> matchedPaylinesSize4;
+    private Dictionary<Symbol, List<List<Vector2>>> matchedPaylinesSize3;
 
     private void Awake()
     {
         gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
         spinGenerator = GameObject.FindGameObjectWithTag("Spin Generator").GetComponent<SpinGenerator>();
+        paylinePathGenerator = GameObject.FindGameObjectWithTag("Payline Path Generator").GetComponent<PaylinePathGenerator>();
         Reset();
 
     }
 
     public void Reset()
     {
-        payoutTallies = new Dictionary<Symbol, int>();
-        payoutStartingVertex = new Dictionary<Symbol, Vector2>();
-        payoutReconstructedPaths = new Dictionary<Symbol, List<Vector2>>();
+        payoutTallies = new Dictionary<Symbol, List<string>>();
+        matchedPaylinesAnySize = new Dictionary<Symbol, List<List<Vector2>>>();
+        matchedPaylinesSize5 = new Dictionary<Symbol, List<List<Vector2>>>();
+        matchedPaylinesSize4 = new Dictionary<Symbol, List<List<Vector2>>>();
+        matchedPaylinesSize3 = new Dictionary<Symbol, List<List<Vector2>>>();
 
         for (int i = 0; i < 5; i++)
         {
-            payoutTallies.Add((Symbol)i, 0);
-            payoutStartingVertex.Add((Symbol)i, new Vector2(-1f, -1f));
-            payoutReconstructedPaths.Add((Symbol)i, new List<Vector2>());
-        }
-    }
-
-    public Dictionary<Symbol, List<Vector2>> GetPayoutReconstructedPaths()
-    {
-        return payoutReconstructedPaths;
-    }
-
-    public Dictionary<Symbol, int> GetPayoutTally()
-    {
-        return payoutTallies;
-    }
-
-    public void FindHighestPayingVertices(List<Symbol[,]> spinnedSymbolsWithWildsReplaced)
-    {
-        for (int symbolID = 4; symbolID >= 0; symbolID--)
-        {
-            scanSymbol = (Symbol)symbolID;
-            spinnedSymbols = spinnedSymbolsWithWildsReplaced[symbolID];
-
-            for (int row = 0; row < 4; row++)
-            {
-                for (int reel = 0; reel < 5; reel++)
-                {
-                    int maxPathLength = 0;
-                    Vector2 startVertex = new Vector2(row, reel);
-                    if (spinnedSymbols[(int)startVertex.x, (int)startVertex.y] == scanSymbol)
-                    {
-                        maxPathLength = Mathf.Max(
-                            TraversePathRec(1, new Vector2(startVertex.x, startVertex.y + 1)),
-                            TraversePathRec(1, new Vector2(startVertex.x - 1, startVertex.y + 1)),
-                            TraversePathRec(1, new Vector2(startVertex.x + 1, startVertex.y + 1))
-                            );
-                    }
-
-                    if (maxPathLength > 2)
-                    {
-                        if (payoutTallies[scanSymbol] < maxPathLength)
-                        {
-                            payoutTallies[scanSymbol] = maxPathLength;
-                            payoutStartingVertex[scanSymbol] = startVertex;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    private int TraversePathRec(int currentPathLength, Vector2 currentVertex)
-    {
-        if (currentVertex.x < 0 || currentVertex.x > 3 || currentVertex.y < 0 || currentVertex.y > 4 || spinnedSymbols[(int)currentVertex.x, (int)currentVertex.y] != scanSymbol)
-        {
-            return currentPathLength;
-        }
-
-        return Mathf.Max(
-            TraversePathRec(currentPathLength + 1, new Vector2(currentVertex.x, currentVertex.y + 1)),
-            TraversePathRec(currentPathLength + 1, new Vector2(currentVertex.x - 1, currentVertex.y + 1)),
-            TraversePathRec(currentPathLength + 1, new Vector2(currentVertex.x + 1, currentVertex.y + 1)));
-    }
-    public void BruteForcePathFromVertexWithRuleset(int ruleset, List<Symbol[,]> spinnedSymbolsWithWildsReplaced, int symbolID)
-    {
-        Vector2 scanVertex = payoutStartingVertex[(Symbol)symbolID];
-        List<Vector2> reconstructedPath = new List<Vector2>();
-
-        bool traversalTerminated = false;
-        while (!traversalTerminated)
-        {
-            reconstructedPath.Add(scanVertex);
-
-            Vector2 goRightUp = new Vector2(scanVertex.x - 1, scanVertex.y + 1);
-            Vector2 goRight = new Vector2(scanVertex.x, scanVertex.y + 1);
-            Vector2 goRightDown = new Vector2(scanVertex.x + 1, scanVertex.y + 1);
-
-            switch (ruleset)
-            {
-                case 0:
-
-                    if (goRight.x >= 0 && goRight.x <= 3 && goRight.y >= 0 && goRight.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRight.x, (int)goRight.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRight;
-                    }
-                    else if (goRightUp.x >= 0 && goRightUp.x <= 3 && goRightUp.y >= 0 && goRightUp.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightUp.x, (int)goRightUp.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightUp;
-                    }
-                    else if (goRightDown.x >= 0 && goRightDown.x <= 3 && goRightDown.y >= 0 && goRightDown.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightDown.x, (int)goRightDown.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightDown;
-                    }
-                    else
-                    {
-                        traversalTerminated = true;
-                    }
-                    break;
-                case 1:
-
-                    if (goRight.x >= 0 && goRight.x <= 3 && goRight.y >= 0 && goRight.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRight.x, (int)goRight.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRight;
-                    }
-                    else if (goRightDown.x >= 0 && goRightDown.x <= 3 && goRightDown.y >= 0 && goRightDown.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightDown.x, (int)goRightDown.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightDown;
-                    }
-                    else if (goRightUp.x >= 0 && goRightUp.x <= 3 && goRightUp.y >= 0 && goRightUp.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightUp.x, (int)goRightUp.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightUp;
-                    }
-                    else
-                    {
-                        traversalTerminated = true;
-                    }
-                    break;
-                case 2:
-                    if (goRightUp.x >= 0 && goRightUp.x <= 3 && goRightUp.y >= 0 && goRightUp.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightUp.x, (int)goRightUp.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightUp;
-                    }
-                    else if (goRight.x >= 0 && goRight.x <= 3 && goRight.y >= 0 && goRight.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRight.x, (int)goRight.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRight;
-                    }
-                    else if (goRightDown.x >= 0 && goRightDown.x <= 3 && goRightDown.y >= 0 && goRightDown.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightDown.x, (int)goRightDown.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightDown;
-                    }
-                    else
-                    {
-                        traversalTerminated = true;
-                    }
-                    break;
-                case 3:
-                    if (goRightUp.x >= 0 && goRightUp.x <= 3 && goRightUp.y >= 0 && goRightUp.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightUp.x, (int)goRightUp.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightUp;
-                    }
-                    else if (goRightDown.x >= 0 && goRightDown.x <= 3 && goRightDown.y >= 0 && goRightDown.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightDown.x, (int)goRightDown.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightDown;
-                    }
-                    else if (goRight.x >= 0 && goRight.x <= 3 && goRight.y >= 0 && goRight.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRight.x, (int)goRight.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRight;
-                    }
-                    else
-                    {
-                        traversalTerminated = true;
-                    }
-                    break;
-                case 4:
-                    if (goRightDown.x >= 0 && goRightDown.x <= 3 && goRightDown.y >= 0 && goRightDown.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightDown.x, (int)goRightDown.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightDown;
-                    }
-                    else if (goRight.x >= 0 && goRight.x <= 3 && goRight.y >= 0 && goRight.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRight.x, (int)goRight.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRight;
-                    }
-                    else if (goRightUp.x >= 0 && goRightUp.x <= 3 && goRightUp.y >= 0 && goRightUp.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightUp.x, (int)goRightUp.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightUp;
-                    }
-                    else
-                    {
-                        traversalTerminated = true;
-                    }
-                    break;
-                case 5:
-                    if (goRightDown.x >= 0 && goRightDown.x <= 3 && goRightDown.y >= 0 && goRightDown.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightDown.x, (int)goRightDown.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightDown;
-                    }
-                    else if (goRightUp.x >= 0 && goRightUp.x <= 3 && goRightUp.y >= 0 && goRightUp.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightUp.x, (int)goRightUp.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRight;
-                    }
-                    else if (goRightDown.x >= 0 && goRightDown.x <= 3 && goRightDown.y >= 0 && goRightDown.y <= 4 && spinnedSymbolsWithWildsReplaced[symbolID][(int)goRightDown.x, (int)goRightDown.y] == (Symbol)symbolID)
-                    {
-                        scanVertex = goRightDown;
-                    }
-                    else
-                    {
-                        traversalTerminated = true;
-                    }
-                    break;
-            }
+            payoutTallies.Add((Symbol)i, new List<string>());
+            matchedPaylinesAnySize.Add((Symbol)i, new List<List<Vector2>> ());
+            matchedPaylinesSize5.Add((Symbol)i, new List<List<Vector2>>());
+            matchedPaylinesSize4.Add((Symbol)i, new List<List<Vector2>>());
+            matchedPaylinesSize3.Add((Symbol)i, new List<List<Vector2>>());
 
         }
-        if (payoutReconstructedPaths[(Symbol)symbolID].Count < reconstructedPath.Count)
-        {
-            payoutReconstructedPaths[(Symbol)symbolID] = reconstructedPath;
-        }
     }
+
+    public Dictionary<Symbol, List<List<Vector2>>> GetWinnerPayoutPaths()
+    {
+        return matchedPaylinesAnySize;
+    }
+
+
+
 
     public void CalculatePayout()
     {
@@ -235,32 +58,128 @@ public class PayoutCalculator : MonoBehaviour
         SpinDatum spinDatum = spinGenerator.GetSpinDatum();
         List<Symbol[,]> spinnedSymbolsWithWildsReplaced = spinDatum.GetSpinnedSymbolsWithWildsReplaced();
 
-        FindHighestPayingVertices(spinnedSymbolsWithWildsReplaced);
-        
+        List<List<Vector2>> totalPayoutPaths = paylinePathGenerator.GetTotalPathsv2();
+
 
         for (int symbolID = 0; symbolID < 5; symbolID++)
         {
-            Debug.Log(" " + payoutTallies[(Symbol)symbolID] + " " + (Symbol)symbolID + " with starting vertex at " + payoutStartingVertex[(Symbol)symbolID]);
-            if (payoutStartingVertex[(Symbol)symbolID] == new Vector2(-1f, -1f))
+            Symbol scanSymbol = (Symbol)symbolID;
+            Symbol[,] spinnedSymbols = spinnedSymbolsWithWildsReplaced[symbolID];
+
+
+            foreach (List<Vector2> path in totalPayoutPaths)
             {
-                continue;
+                bool pathSuccess = true;
+
+                foreach (Vector2 vertex in path)
+                {
+                    if (spinnedSymbols[(int) vertex.x, (int) vertex.y] != scanSymbol)
+                    {
+                        pathSuccess = false;
+                        break;
+                    }
+                }
+                if (pathSuccess)
+                {
+                    matchedPaylinesAnySize[scanSymbol].Add(path);
+                }
+
             }
 
-            for(int ruleset = 0; ruleset < 6; ruleset++)
+
+
+            foreach(List<Vector2> path in matchedPaylinesAnySize[scanSymbol])
             {
-                BruteForcePathFromVertexWithRuleset(ruleset, spinnedSymbolsWithWildsReplaced, symbolID);
+                if (path.Count == 5)
+                {
+                    matchedPaylinesSize5[scanSymbol].Add(path);
+                } else if (path.Count == 4)
+                {
+                    matchedPaylinesSize4[scanSymbol].Add(path);
+                } else if (path.Count == 3)
+                {
+                    matchedPaylinesSize3[scanSymbol].Add(path);
+                }
 
             }
 
-            // TODO: Award Balance according to Tally
 
-            gameState.SetTrigger("Calculated Payout");
+            List<List<Vector2>> dirtyPaths = new List<List<Vector2>>();
 
-    }
+            foreach(List<Vector2> path5 in matchedPaylinesSize5[scanSymbol])
+            {
+                foreach(List<Vector2> path4 in matchedPaylinesSize4[scanSymbol])
+                {
+                    if (NumberOfSharedVertices(path5,path4) == 4)
+                    {
+                        dirtyPaths.Add(path4);
+                            
+                    }
+                }
+
+                foreach (List<Vector2> path3 in matchedPaylinesSize3[scanSymbol])
+                {
+                    if (NumberOfSharedVertices(path5,path3) == 3)
+                    {
+                        dirtyPaths.Add(path3);
+                    }
+                }
+            }
+
+            foreach(List<Vector2> path4 in matchedPaylinesSize4[scanSymbol])
+            {
+                foreach (List<Vector2> path3 in matchedPaylinesSize3[scanSymbol])
+                {
+                    if (NumberOfSharedVertices(path4,path3) == 3)
+                    {
+                        dirtyPaths.Add(path3);
+                    }
+                }
+            }
+
+            foreach(List<Vector2> path in dirtyPaths)
+            {
+                if (matchedPaylinesSize4[scanSymbol].Contains(path))
+                {
+                    matchedPaylinesSize4[scanSymbol].Remove(path);
+                }
+                if (matchedPaylinesSize3[scanSymbol].Contains(path))
+                {
+                    matchedPaylinesSize3[scanSymbol].Remove(path);
+                }
+            }
+
+            Debug.Log(scanSymbol + " paths length 5: " + matchedPaylinesSize5[scanSymbol].Count);
+            Debug.Log(scanSymbol + " paths length 4: " + matchedPaylinesSize4[scanSymbol].Count);
+            Debug.Log(scanSymbol + " paths length 3: " + matchedPaylinesSize3[scanSymbol].Count);
+
+            foreach(List<Vector2> path in matchedPaylinesSize5[scanSymbol])
+            {
+                payoutTallies[scanSymbol].Add("" + path.Count + scanSymbol);
+            }
+
         }
 
 
+        // TODO: Award Balance according to Tally
 
+        gameState.SetTrigger("Calculated Payout");
+
+ 
+        }
+
+    private int NumberOfSharedVertices(List<Vector2> path1, List<Vector2> path2)
+    {
+        int sharedVertices = 0;
+        foreach(Vector2 vertex in path1)
+        {
+            if (path2.Contains(vertex))
+            {
+                sharedVertices++;
+            }
+        }
+        return sharedVertices;
+    }
 
 }
 
