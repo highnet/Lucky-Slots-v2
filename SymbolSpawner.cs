@@ -39,7 +39,7 @@ public class SymbolSpawner : MonoBehaviour
             {
 
                 GameObject gameSymbolGO = gameSymbolPool.FetchFromPool(spinnedSymbols[i, j]);
-                activeSymbols.AddToActiveSymbols(gameSymbolGO);
+                activeSymbols.AddToActiveSymbols(gameSymbolGO,i,j);
                 GameSymbol gameSymbol = gameSymbolGO.GetComponent<GameSymbol>();
                 gameSymbol.MoveToPosition(slotsAnchors.GetStartAnchors()[j].transform.position);
                 gameSymbol.SetTweenParameters(slotsAnchors.GetSymbolAnchors()[i, j].transform.position, .8f);

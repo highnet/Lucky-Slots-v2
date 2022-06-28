@@ -8,7 +8,6 @@ public class SpinDatum
 {
     private Symbol[,] spinnedSymbolsWithWilds;
     private List<Symbol[,]> spinnedSymbolsReplacedWilds;
-
     public SpinDatum()
     {
         spinnedSymbolsWithWilds = GenerateRoll();
@@ -81,14 +80,48 @@ public class SpinDatum
 
     private Symbol[,] GenerateRoll()
     {
+        int rng = 0;
+        Symbol symbol = Symbol.Ten;
         Symbol[,] symbolsArray = new Symbol[SlotsAttributes.GetNumberOfRows(), SlotsAttributes.GetNumberOfReels()];
+        int tenThreshold = 450;
+        int jackThreshold = 550;
+        int queenThreshold = 750;
+        int kingThreshold = 880;
+        int aceThrehsold = 970;
+        int wildThreshold = 990;
+        int bonusThreshold = 999;
 
 
         for(int i = 0; i < SlotsAttributes.GetNumberOfRows(); i++)
         {
             for (int j = 0; j < SlotsAttributes.GetNumberOfReels(); j++)
             {
-                symbolsArray[i, j] = (Symbol)UnityEngine.Random.Range(0, SlotsAttributes.GetNumberOfSymbols());
+                rng = UnityEngine.Random.Range(0, 999);
+                Debug.Log(rng);
+                if (rng < tenThreshold)
+                {
+                    symbol = Symbol.Ten;
+                } else if (rng < jackThreshold)
+                {
+                    symbol = Symbol.Jack;
+                } else if (rng < queenThreshold)
+                {
+                    symbol = Symbol.Queen;
+                } else if (rng < kingThreshold)
+                {
+                    symbol = Symbol.King;
+                } else if (rng < aceThrehsold)
+                {
+                    symbol = Symbol.Ace;
+                } else if (rng < wildThreshold)
+                {
+                    symbol = Symbol.Wild;
+                } else
+                {
+                    symbol = Symbol.Bonus;
+                }
+                Debug.Log(symbol);
+                symbolsArray[i, j] = symbol;
             }
         }
         return symbolsArray;

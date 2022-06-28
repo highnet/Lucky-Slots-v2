@@ -8,24 +8,26 @@ public class PayoutCalculator : MonoBehaviour
     private GameState gameState;
     private SpinGenerator spinGenerator;
     private PaylinePathGenerator paylinePathGenerator;
-    private Dictionary<Symbol, List<string>> payoutTallies  ;
+    private List<string> payoutTallies;
     private Dictionary<Symbol, List<List<Vector2>>> matchedPaylinesAnySize;
     private Dictionary<Symbol, List<List<Vector2>>> matchedPaylinesSize5;
     private Dictionary<Symbol, List<List<Vector2>>> matchedPaylinesSize4;
     private Dictionary<Symbol, List<List<Vector2>>> matchedPaylinesSize3;
+    private Player player;
 
     private void Awake()
     {
         gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
         spinGenerator = GameObject.FindGameObjectWithTag("Spin Generator").GetComponent<SpinGenerator>();
         paylinePathGenerator = GameObject.FindGameObjectWithTag("Payline Path Generator").GetComponent<PaylinePathGenerator>();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         Reset();
 
     }
 
     public void Reset()
     {
-        payoutTallies = new Dictionary<Symbol, List<string>>();
+        payoutTallies = new List<string>();
         matchedPaylinesAnySize = new Dictionary<Symbol, List<List<Vector2>>>();
         matchedPaylinesSize5 = new Dictionary<Symbol, List<List<Vector2>>>();
         matchedPaylinesSize4 = new Dictionary<Symbol, List<List<Vector2>>>();
@@ -33,7 +35,6 @@ public class PayoutCalculator : MonoBehaviour
 
         for (int i = 0; i < 5; i++)
         {
-            payoutTallies.Add((Symbol)i, new List<string>());
             matchedPaylinesAnySize.Add((Symbol)i, new List<List<Vector2>> ());
             matchedPaylinesSize5.Add((Symbol)i, new List<List<Vector2>>());
             matchedPaylinesSize4.Add((Symbol)i, new List<List<Vector2>>());
@@ -42,8 +43,18 @@ public class PayoutCalculator : MonoBehaviour
         }
     }
 
-    public Dictionary<Symbol, List<List<Vector2>>> GetWinnerPayoutPaths()
+    public Dictionary<Symbol, List<List<Vector2>>> GetWinnerPayoutPaths(int size)
     {
+        if (size == 5)
+        {
+            return matchedPaylinesSize5;
+        } else if (size == 4)
+        {
+            return matchedPaylinesSize4;
+        } else if (size == 3)
+        {
+            return matchedPaylinesSize3;
+        }
         return matchedPaylinesAnySize;
     }
 
@@ -83,10 +94,7 @@ public class PayoutCalculator : MonoBehaviour
                 {
                     matchedPaylinesAnySize[scanSymbol].Add(path);
                 }
-
             }
-
-
 
             foreach(List<Vector2> path in matchedPaylinesAnySize[scanSymbol])
             {
@@ -100,9 +108,7 @@ public class PayoutCalculator : MonoBehaviour
                 {
                     matchedPaylinesSize3[scanSymbol].Add(path);
                 }
-
             }
-
 
             List<List<Vector2>> dirtyPaths = new List<List<Vector2>>();
 
@@ -149,19 +155,83 @@ public class PayoutCalculator : MonoBehaviour
                 }
             }
 
-            Debug.Log(scanSymbol + " paths length 5: " + matchedPaylinesSize5[scanSymbol].Count);
-            Debug.Log(scanSymbol + " paths length 4: " + matchedPaylinesSize4[scanSymbol].Count);
-            Debug.Log(scanSymbol + " paths length 3: " + matchedPaylinesSize3[scanSymbol].Count);
-
             foreach(List<Vector2> path in matchedPaylinesSize5[scanSymbol])
             {
-                payoutTallies[scanSymbol].Add("" + path.Count + scanSymbol);
+                payoutTallies.Add("" + path.Count + " " + scanSymbol);
+            }
+            foreach (List<Vector2> path in matchedPaylinesSize4[scanSymbol])
+            {
+                payoutTallies.Add("" + path.Count + " "+ scanSymbol);
+            }
+            foreach (List<Vector2> path in matchedPaylinesSize3[scanSymbol])
+            {
+                payoutTallies.Add("" + path.Count + " " + scanSymbol);
             }
 
         }
 
+        float multiplier = 0f;
+        float bet = player.GetBet();
 
-        // TODO: Award Balance according to Tally
+        foreach (string tally in payoutTallies)
+        {
+            Debug.Log(tally);
+            switch (tally)
+            {
+                case ("3 Ten"):
+                    multiplier += .25f;
+                    break;
+                case ("4 Ten"):
+                    multiplier += 1f;
+                    break;
+                case ("5 Ten"):
+                    multiplier += 5f;
+                    break;
+                case ("3 Jack"):
+                    multiplier += .5f;
+                    break;
+                case ("4 Jack"):
+                    multiplier += 2f;
+                    break;
+                case ("5 Jack"):
+                    multiplier += 10f;
+                    break;
+                case ("3 Queen"):
+                    multiplier += 1f;
+                    break;
+                case ("4 Queen"):
+                    multiplier += 4f;
+                    break;
+                case ("5 Queen"):
+                    multiplier += 20f;
+                    break;
+                case ("3 King"):
+                    multiplier += 2f;
+                    break;
+                case ("4 King"):
+                    multiplier += 8f;
+                    break;
+                case ("5 King"):
+                    multiplier += 40f;
+                    break;
+                case ("3 Ace"):
+                    multiplier += 4;
+                    break;
+                case ("4 Ace"):
+                    multiplier += 12;
+                    break;
+                case ("5 Ace"):
+                    multiplier += 56;
+                    break;
+
+            }
+
+                
+        }
+        Debug.Log("Bet: " + bet);
+        Debug.Log("Multiplier: " + multiplier);
+        float winnings = bet * multiplier;
+        player.AwardBalance(winnings);
 
         gameState.SetTrigger("Calculated Payout");
 

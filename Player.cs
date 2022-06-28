@@ -5,21 +5,36 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField]
-    private float bet = 0.1f;
-    [SerializeField]
-    private float balance = 100f;
     private UI ui;
 
+    [SerializeField]
+    private float bet;
+    [SerializeField]
+    private float balance;
+    [SerializeField]
+    private float previousWinnings = 0f;
+    [SerializeField]
+    private float previousMultiplier = 0f;
     private void Awake()
     {
         ui = GameObject.FindGameObjectWithTag("UI").GetComponent<UI>();
     }
 
-    public void AwardBalance(float winnings)
+    public void AwardBalance(float award)
     {
-        balance += winnings;
+        previousWinnings = award;
+        balance += award;
         ui.UpdateBalanceText();
+    }
+
+    public void SetPreviousWinnings(float award)
+    {
+        previousWinnings = award;
+    }
+
+    public float GetPreviousWinnings()
+    {
+        return previousWinnings;
     }
 
     public float GetBet()
@@ -41,5 +56,41 @@ public class Player : MonoBehaviour
     public bool CanSetBet()
     {
         return bet <= balance;
+    }
+
+    public void CycleBet()
+    {
+        switch (bet)
+        {
+            case (.1f):
+                bet = .5f;
+                break;
+            case (.5f):
+                bet = 1f;
+                break;
+            case (1f):
+                bet = 5f;
+                break;
+            case (5f):
+                bet = 10f;
+                break;
+            case (10f):
+                bet = 50f;
+                break;
+            case (50f):
+                bet = 100f;
+                break;
+            case (100f):
+                bet = 500f;
+                break;
+            case (500f):
+                bet = 1000f;
+                break;
+            case (1000f):
+                bet = .1f;
+                break;
+        }
+        ui.UpdateBetText();
+            
     }
 }

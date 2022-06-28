@@ -19,31 +19,37 @@ public class SymbolResetter : MonoBehaviour
     public void ResetActiveSymbols()
     {
         StartCoroutine(ResetActiveSymbolsCoroutine());
-        StartCoroutine(TransitionToNextStateAfterSeconds(2.0f));
+        StartCoroutine(TransitionToNextStateAfterSeconds(.5f));
     }
 
     private IEnumerator TransitionToNextStateAfterSeconds(float seconds)
     {
-        if (activeSymbols.GetActiveGameSymbols().Count > 0)
-        {
-            yield return new WaitForSeconds(seconds);
+        yield return new WaitForSeconds(seconds);
 
-        } 
         gameState.SetTrigger("Resetted Symbols");
     }
 
     private IEnumerator ResetActiveSymbolsCoroutine()
     {
-        List<GameObject> activeGameSymbols = activeSymbols.GetActiveGameSymbols(); 
-        for(int i = 0; i < activeGameSymbols.Count; i++)
+        GameObject[,] activeGameSymbols = activeSymbols.GetActiveGameSymbols(); 
+        for(int i = 0; i < SlotsAttributes.GetNumberOfReels(); i++)
         {
-            GameSymbol gameSymbol = activeGameSymbols[i].GetComponent<GameSymbol>();
-            gameSymbol.SetTweenParameters(gameSymbol.GetResetPosition(), .5f - (i * .01f));
-            gameSymbol.SetIsFakeSymbol(true);
-            gameSymbol.SetForceTween(true);
-            yield return new WaitForSeconds(.02f);
+            for(int j = 0; j < SlotsAttributes.GetNumberOfRows(); j++)
+            {
+                if (activeGameSymbols[j,i] != null)
+                {
+                    GameSymbol gameSymbol = activeGameSymbols[j, i].GetComponent<GameSymbol>();
+                    gameSymbol.SetTweenParameters(gameSymbol.GetResetPosition(), .5f - (.01f * i) - (0.05f * j));
+                    gameSymbol.SetIsFakeSymbol(true);
+                    gameSymbol.SetForceTween(true);
+                }
 
+                yield return new WaitForSeconds(.02f);
+            }
+            yield return new WaitForSeconds(.04f);
 
         }
+
+        activeSymbols.Reset();
     }
 }

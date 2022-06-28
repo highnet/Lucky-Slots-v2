@@ -11,12 +11,13 @@ public class Payline : MonoBehaviour
     [SerializeField]
     private Symbol paylineSymbol;
     private SlotsAnchors slotsAnchors;
-
+    private Renderer renderer;
     private void Awake()
     {
         slotsAnchors = GameObject.FindGameObjectWithTag("Slots Anchors").GetComponent<SlotsAnchors>();
         lineRenderer = GetComponent<LineRenderer>();
         path = new List<Vector2>();
+        renderer = GetComponent<Renderer>();
     }
 
     public void SetPaylineSymbol(Symbol newPaylineSymbol)
@@ -45,6 +46,19 @@ public class Payline : MonoBehaviour
         for(int i = 0; i < path.Count; i++)
         {
             lineRenderer.SetPosition(i, slotsAnchors.GetSymbolAnchors()[(int)path[i].x, (int)path[i].y].transform.position);
+        }
+
+        if (path.Count == 5)
+        {
+            renderer.material.color = Color.red;
+        } else if (path.Count == 4)
+        {
+            renderer.material.color = Color.green;
+        }
+        else if (path.Count == 3)
+        {
+            renderer.material.color = Color.blue;
+
         }
     }
 

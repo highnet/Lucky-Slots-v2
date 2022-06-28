@@ -45,10 +45,6 @@ public class PaylinePathGenerator : MonoBehaviour
 
         }
 
-
-
-
-
         slotsMapping.Add(0, new Vector2(0, 0));
         slotsMapping.Add(1, new Vector2(0, 1));
         slotsMapping.Add(2, new Vector2(0, 2));
@@ -195,66 +191,66 @@ public class PaylinePathGenerator : MonoBehaviour
 
     private void GenerateSlotsGraph()
     {
-        slotsGraph.addEdge(0, 1);
-        slotsGraph.addEdge(0, 6);
+        slotsGraph.AddEdge(0, 1);
+        slotsGraph.AddEdge(0, 6);
 
-        slotsGraph.addEdge(1, 2);
-        slotsGraph.addEdge(1, 7);
+        slotsGraph.AddEdge(1, 2);
+        slotsGraph.AddEdge(1, 7);
 
-        slotsGraph.addEdge(2, 3);
-        slotsGraph.addEdge(2, 8);
+        slotsGraph.AddEdge(2, 3);
+        slotsGraph.AddEdge(2, 8);
 
-        slotsGraph.addEdge(3, 4);
-        slotsGraph.addEdge(3, 9);
+        slotsGraph.AddEdge(3, 4);
+        slotsGraph.AddEdge(3, 9);
 
-        slotsGraph.addEdge(5, 1);
-        slotsGraph.addEdge(5, 6);
-        slotsGraph.addEdge(5, 11);
+        slotsGraph.AddEdge(5, 1);
+        slotsGraph.AddEdge(5, 6);
+        slotsGraph.AddEdge(5, 11);
 
-        slotsGraph.addEdge(6, 2);
-        slotsGraph.addEdge(6, 7);
-        slotsGraph.addEdge(6, 12);
+        slotsGraph.AddEdge(6, 2);
+        slotsGraph.AddEdge(6, 7);
+        slotsGraph.AddEdge(6, 12);
 
-        slotsGraph.addEdge(7, 3);
-        slotsGraph.addEdge(7, 8);
-        slotsGraph.addEdge(7, 13);
+        slotsGraph.AddEdge(7, 3);
+        slotsGraph.AddEdge(7, 8);
+        slotsGraph.AddEdge(7, 13);
 
-        slotsGraph.addEdge(8, 4);
-        slotsGraph.addEdge(8, 9);
-        slotsGraph.addEdge(8, 14);
+        slotsGraph.AddEdge(8, 4);
+        slotsGraph.AddEdge(8, 9);
+        slotsGraph.AddEdge(8, 14);
 
-        slotsGraph.addEdge(10, 6);
-        slotsGraph.addEdge(10, 11);
-        slotsGraph.addEdge(10, 16);
+        slotsGraph.AddEdge(10, 6);
+        slotsGraph.AddEdge(10, 11);
+        slotsGraph.AddEdge(10, 16);
 
-        slotsGraph.addEdge(11, 7);
-        slotsGraph.addEdge(11, 12);
-        slotsGraph.addEdge(11, 17);
+        slotsGraph.AddEdge(11, 7);
+        slotsGraph.AddEdge(11, 12);
+        slotsGraph.AddEdge(11, 17);
 
-        slotsGraph.addEdge(12, 8);
-        slotsGraph.addEdge(12, 13);
-        slotsGraph.addEdge(12, 18);
+        slotsGraph.AddEdge(12, 8);
+        slotsGraph.AddEdge(12, 13);
+        slotsGraph.AddEdge(12, 18);
 
-        slotsGraph.addEdge(13, 9);
-        slotsGraph.addEdge(13, 14);
-        slotsGraph.addEdge(13, 19);
+        slotsGraph.AddEdge(13, 9);
+        slotsGraph.AddEdge(13, 14);
+        slotsGraph.AddEdge(13, 19);
 
-        slotsGraph.addEdge(15, 11);
-        slotsGraph.addEdge(15, 16);
+        slotsGraph.AddEdge(15, 11);
+        slotsGraph.AddEdge(15, 16);
 
-        slotsGraph.addEdge(16, 12);
-        slotsGraph.addEdge(16, 17);
+        slotsGraph.AddEdge(16, 12);
+        slotsGraph.AddEdge(16, 17);
 
-        slotsGraph.addEdge(17, 13);
-        slotsGraph.addEdge(17, 18);
+        slotsGraph.AddEdge(17, 13);
+        slotsGraph.AddEdge(17, 18);
 
-        slotsGraph.addEdge(18, 14);
-        slotsGraph.addEdge(18, 19);
+        slotsGraph.AddEdge(18, 14);
+        slotsGraph.AddEdge(18, 19);
     }
 
     private void GeneratePaths(int v1, int v2)
     {
-        List<string> generatedPathStrings = slotsGraph.dfsGenerateAllPaths(v1, v2);
+        List<string> generatedPathStrings = slotsGraph.DFSGenerateAllPaths(v1, v2);
 
         foreach (string path in generatedPathStrings)
         {
@@ -280,104 +276,74 @@ public class PaylinePathGenerator : MonoBehaviour
     public class Graph
     {
 
-        // No. of vertices in graph
-        private int v;
+        private int numberOfVertices;
 
-        // adjacency list
-        private List<int>[] adjList;
+        private List<int>[] adjancencyList;
 
         private List<string> generatedPaths;
 
-        // Constructor
         public Graph(int vertices)
         {
 
             this.generatedPaths = new List<string>();
-            // initialise vertex count
-            this.v = vertices;
-
-            // initialise adjacency list
-            initAdjList();
+            this.numberOfVertices = vertices;
+            InitializeAdjacencyList();
         }
 
-        // utility method to initialise
-        // adjacency list
-        private void initAdjList()
+        private void InitializeAdjacencyList()
         {
-            adjList = new List<int>[v];
+            adjancencyList = new List<int>[numberOfVertices];
 
-            for (int i = 0; i < v; i++)
+            for (int i = 0; i < numberOfVertices; i++)
             {
-                adjList[i] = new List<int>();
+                adjancencyList[i] = new List<int>();
             }
         }
 
-        // add edge from u to v
-        public void addEdge(int u, int v)
+        public void AddEdge(int u, int v)
         {
-            // Add v to u's list.
-            adjList[u].Add(v);
+            adjancencyList[u].Add(v);
         }
 
-        // Prints all paths from
-        // 's' to 'd'
-        public List<string> dfsGenerateAllPaths(int s, int d)
+
+        public List<string> DFSGenerateAllPaths(int source, int destination)
         {
-            bool[] isVisited = new bool[v];
+            bool[] isVisited = new bool[numberOfVertices];
             List<int> pathList = new List<int>();
 
-            // add source to path[]
-            pathList.Add(s);
+            pathList.Add(source);
 
-            // Call recursive utility
-            dfs(s, d, isVisited, pathList);
+            DFS(source, destination, isVisited, pathList);
 
             return generatedPaths;
         }
 
-        // A recursive function to print
-        // all paths from 'u' to 'd'.
-        // isVisited[] keeps track of
-        // vertices in current path.
-        // localPathList<> stores actual
-        // vertices in the current path
-        private void dfs(int u, int d,
+        private void DFS(int current, int destination,
                                        bool[] isVisited,
                                        List<int> localPathList)
         {
 
-            if (u.Equals(d))
+            if (current.Equals(destination))
             {
                 string resultingPath = string.Join(" ", localPathList);
                 generatedPaths.Add(resultingPath);
-                // if match found then no need
-                // to traverse more till depth
                 return;
             }
 
-            // Mark the current node
-            isVisited[u] = true;
+            isVisited[current] = true;
 
-            // Recur for all the vertices
-            // adjacent to current vertex
-            foreach (int i in adjList[u])
+            foreach (int neighbor in adjancencyList[current])
             {
-                if (!isVisited[i])
+                if (!isVisited[neighbor])
                 {
-                    // store current node
-                    // in path[]
-                    localPathList.Add(i);
-                    dfs(i, d, isVisited,
+                    localPathList.Add(neighbor);
+                    DFS(neighbor, destination, isVisited,
                                       localPathList);
-
-                    // remove current node
-                    // in path[]
-                    localPathList.Remove(i);
+                    localPathList.Remove(neighbor);
                 }
             }
 
-            // Mark the current node
-            isVisited[u] = false;
+            isVisited[current] = false;
         }
 
 

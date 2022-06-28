@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class PaylineAnimator : MonoBehaviour
 {
@@ -15,13 +16,33 @@ public class PaylineAnimator : MonoBehaviour
         payoutCalculator = GameObject.FindGameObjectWithTag("Payout Calculator").GetComponent<PayoutCalculator>();
         paylineSpawner = GameObject.FindGameObjectWithTag("Payline Spawner").GetComponent<PaylineSpawner>();
     }
-    public void AnimatePaylines()
+        public void AnimatePaylines()
     {
-        Dictionary<Symbol, List<List<Vector2>>> winnerPayoutPaths = payoutCalculator.GetWinnerPayoutPaths();
+        Dictionary<Symbol, List<List<Vector2>>> winnerPayoutPaths5 = payoutCalculator.GetWinnerPayoutPaths(5);
+        Dictionary<Symbol, List<List<Vector2>>> winnerPayoutPaths4 = payoutCalculator.GetWinnerPayoutPaths(4);
+        Dictionary<Symbol, List<List<Vector2>>> winnerPayoutPaths3 = payoutCalculator.GetWinnerPayoutPaths(3);
 
-        for(int i = 0; i < 5; i++)
+
+        for (int i = 0; i < 5; i++)
         {
-            foreach(List<Vector2> path in winnerPayoutPaths[(Symbol)i])
+            foreach(List<Vector2> path in winnerPayoutPaths5[(Symbol)i])
+            {
+                GameObject paylineGO = paylineSpawner.FetchFromPaylinesPool();
+                paylineSpawner.AddToActivePaylines(paylineGO);
+                Payline payline = paylineGO.GetComponent<Payline>();
+                payline.SetPath(path);
+                payline.RenderPayline();
+            }
+
+            foreach (List<Vector2> path in winnerPayoutPaths4[(Symbol)i])
+            {
+                GameObject paylineGO = paylineSpawner.FetchFromPaylinesPool();
+                paylineSpawner.AddToActivePaylines(paylineGO);
+                Payline payline = paylineGO.GetComponent<Payline>();
+                payline.SetPath(path);
+                payline.RenderPayline();
+            }
+            foreach (List<Vector2> path in winnerPayoutPaths3[(Symbol)i])
             {
                 GameObject paylineGO = paylineSpawner.FetchFromPaylinesPool();
                 paylineSpawner.AddToActivePaylines(paylineGO);
@@ -34,5 +55,8 @@ public class PaylineAnimator : MonoBehaviour
         }
         gameState.SetTrigger("Animated Paylines");
 
+
     }
+
+
 }

@@ -83,7 +83,6 @@ public class GameSymbol : MonoBehaviour
         {
             MoveToPosition(new Vector3(50f, 50f, 0f));
             gameSymbolPool.AddToPool(this.symbol, this.gameObject);
-            activeSymbols.RemoveFromActiveSymbols(this.gameObject);
             endPosition = new Vector3(-1f, -1f, -1f);
             tweenDuration = 0f;
             isFakeSymbol = false;

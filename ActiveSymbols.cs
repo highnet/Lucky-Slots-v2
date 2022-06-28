@@ -5,37 +5,51 @@ using UnityEngine;
 public class ActiveSymbols : MonoBehaviour
 {
     [SerializeField]
-    private List<GameObject> activeSymbols;
+    private GameObject[,] activeSymbols; // TODO: change this to a 2d object array
     private GameState gameState;
     private void Awake()
     {
-        activeSymbols = new List<GameObject>();
+        activeSymbols = new GameObject[SlotsAttributes.GetNumberOfRows(), SlotsAttributes.GetNumberOfReels()];
         gameState = GameObject.FindGameObjectWithTag("Game State").GetComponent<GameState>();
     }
 
-    public List<GameObject> GetActiveGameSymbols()
+    public GameObject[,] GetActiveGameSymbols()
     {
         return activeSymbols;
     }
 
-    public void AddToActiveSymbols(GameObject objectToAdd) 
+    public void AddToActiveSymbols(GameObject objectToAdd,int row, int reel) 
     {
-        activeSymbols.Add(objectToAdd);
+        activeSymbols[row, reel] = objectToAdd;
     }
-    public void RemoveFromActiveSymbols(GameObject objectToRemove)
+    public void RemoveFromActiveSymbols(int row, int reel)
     {
-        activeSymbols.Remove(objectToRemove);
+        activeSymbols[row, reel] = null;
+    }
+
+    public void Reset()
+    {
+        activeSymbols = new GameObject[SlotsAttributes.GetNumberOfRows(), SlotsAttributes.GetNumberOfReels()];
+
     }
     public bool HasActiveTween()
     {
 
-        for (int i = 0; i < activeSymbols.Count; i++)
+        for (int i = 0; i < SlotsAttributes.GetNumberOfRows(); i++)
         {
-            GameSymbol gameSymbol = activeSymbols[i].GetComponent<GameSymbol>();
-            if (gameSymbol.GetTween() != null)
+            for(int j = 0; j < SlotsAttributes.GetNumberOfReels(); j++)
             {
-                return true;
+                if (activeSymbols[i,j] != null)
+                {
+                    GameSymbol gameSymbol = activeSymbols[i, j].GetComponent<GameSymbol>();
+                    if (gameSymbol.GetTween() != null)
+                    {
+                        return true;
+                    }
+                }
+
             }
+
         }
         return false;
     }
